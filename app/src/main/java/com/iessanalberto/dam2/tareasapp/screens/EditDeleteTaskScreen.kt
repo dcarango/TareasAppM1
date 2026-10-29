@@ -5,8 +5,11 @@ import androidx.compose.material3.Button
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
@@ -17,6 +20,7 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,9 +32,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.iessanalberto.dam2.tareasapp.data.buscarTarea
 import com.iessanalberto.dam2.tareasapp.data.listaTareas
+import com.iessanalberto.dam2.tareasapp.models.Estado
 import com.iessanalberto.dam2.tareasapp.models.Tarea
 
 @Composable
@@ -41,6 +48,7 @@ fun EditDeleteTaskScreen(navController: NavController, id: Int) {
     // Esto es para el AlertDialog
     var showDialog by remember { mutableStateOf(false) }
 
+    // En caso de que la lista esté vacia
     if (tarea == null) {
         Toast.makeText(context,"Algo fue mal", Toast.LENGTH_SHORT).show()
         navController.popBackStack()
@@ -59,8 +67,6 @@ fun EditDeleteTaskScreen(navController: NavController, id: Int) {
                     FloatingActionButton(
                         onClick = {
                             showDialog = true
-
-
                         },
                         containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
                         elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
@@ -73,7 +79,6 @@ fun EditDeleteTaskScreen(navController: NavController, id: Int) {
             )
         }
 
-
         ) { innerPadding ->
         EditDeleteBodyContent(modifier = Modifier.padding(innerPadding),
             navController = navController,
@@ -82,16 +87,13 @@ fun EditDeleteTaskScreen(navController: NavController, id: Int) {
             context = context) }
 
     // AlertDialog (Hay que manejarlo con una bandera)
-
     if (showDialog) {
         AlertDialog(
             icon = {Icon(imageVector = Icons.Filled.Delete,
                 contentDescription = "Confirmar borrado")},
             title = {Text(text = "Confirmar borrado")},
             text = {Text(text = "¿Estás seguro? ${tarea!!.nombre}?")},
-            onDismissRequest = {
-                showDialog = false
-            },
+            onDismissRequest = { showDialog = false },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -128,7 +130,7 @@ fun EditDeleteBodyContent(
     var nombre by remember { mutableStateOf(tarea.nombre) }
     var responsable by remember { mutableStateOf(tarea.responsable) }
     var descripcion by remember { mutableStateOf(tarea.descripcion) }
-    var estado by remember { mutableStateOf(tarea.estado) }
+    var estadoSeleccionado by remember { mutableStateOf(tarea.estado) }
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -152,16 +154,32 @@ fun EditDeleteBodyContent(
             onValueChange = {descripcion= it},
             label = {Text(text = "Descripcion")}
         )
-        OutlinedTextField(
-            value = estado,
-            onValueChange = {estado= it},
-            label = {Text(text = "estado")}
-        )
+
+        // RADIO BUTTON
+        Estado.entries.forEach { estado ->
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .selectable(
+                        selected = (estado == estadoSeleccionado),
+                        onClick = {estadoSeleccionado = estado},
+                        role = Role.RadioButton
+                    )
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                RadioButton(
+                    selected = (estado == estadoSeleccionado),
+                    onClick = null
+                )
+                Text(text = estado.etiqueta, modifier = Modifier.padding(start = 8.dp))
+            }
+        }
+
         Button(onClick = {
             tarea.nombre = nombre
             tarea.responsable = responsable
             tarea.descripcion = descripcion
-            tarea.estado = estado
+            tarea.estado = estadoSeleccionado
 
             Toast.makeText(context,"Tarea actualizada", Toast.LENGTH_SHORT).show()
             navController.popBackStack()

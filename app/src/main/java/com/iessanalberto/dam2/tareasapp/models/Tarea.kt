@@ -8,7 +8,7 @@ data class Tarea(
     var nombre: String,
     var responsable : String,
     var descripcion: String,
-    var estado: String = "Por hacer", // Darle un vaor por defecto, no pedirá el contruirlo
+    var estado: Estado = Estado.PENDIENTE
 ) {
     // Esto es el equivalente al static
     companion object{
@@ -19,4 +19,11 @@ data class Tarea(
         //  retrun contador++
         //  }
     }
+
+}
+
+enum class Estado (val etiqueta: String) {
+    PENDIENTE (etiqueta = "Pendiente") ,
+    EN_PROGRESO (etiqueta = "En progreso"),
+    COMPLETADO (etiqueta = "Completado")
 }

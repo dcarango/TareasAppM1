@@ -1,6 +1,7 @@
 package com.iessanalberto.dam2.tareasapp.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CardDefaults
@@ -20,16 +21,20 @@ import com.iessanalberto.dam2.tareasapp.models.Tarea
  */
 @Composable
 fun MyCard (tarea: Tarea,
+            modifier: Modifier = Modifier,
             onClick: () -> Unit
 ) {
     // Tipicia tarjeta
     ElevatedCard (
         // Aqui van parametros de edición
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = colorResource(R.color.MyColor)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        modifier = Modifier.size(width = 240.dp, height = 400.dp).padding(15.dp),
+
 
         // Lo que pasa cuando haces click
         // Se la pasamos por parametro
@@ -45,13 +50,8 @@ fun MyCard (tarea: Tarea,
         Text(text = "Descripción: ${tarea.descripcion}",
             modifier = Modifier.padding(16.dp),
             textAlign = TextAlign.Center)
-        Text(text = "Estado: ${tarea.estado}",
+        Text(text = "Estado: ${tarea.estado.etiqueta}", // Revisar
             modifier = Modifier.padding(16.dp),
             textAlign = TextAlign.Center)
-        Image(
-            painter =  painterResource(R.drawable.ottoniel),
-            contentDescription = "El baboso de mi gato"
-        )
-
     }
 }
